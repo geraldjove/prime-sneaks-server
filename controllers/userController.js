@@ -56,7 +56,7 @@ module.exports.getUsers = async (req, res) => {
   }
 };
 
-module.exports.getUser = async (req, res) => {
+module.exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     const {
@@ -93,6 +93,15 @@ module.exports.getUser = async (req, res) => {
   }
 };
 
+module.exports.getUser = async (req, res) => {
+  try {
+    const response = await User.findById(req.params.id);
+    res.send(response);
+  } catch (error) {
+    res.send("Error " + error);
+  }
+};
+
 module.exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete({ _id: req.params.id });
@@ -107,6 +116,54 @@ module.exports.deleteUser = async (req, res) => {
   }
 };
 
+module.exports.adminUpdateUser = async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      contactEmail,
+      contactPhone,
+      password,
+      birthDate,
+      contactAddress,
+      isAdmin,
+    } = req.body;
+
+    // Create an object to hold the updated fields
+    const updateFields = {
+      firstName,
+      lastName,
+      contactEmail,
+      contactPhone,
+      contactAddress,
+      birthDate,
+      isAdmin,
+    };
+
+    // Only hash and update the password if it is provided
+    if (password) {
+      updateFields.password = bcrypt.hashSync(password, 10);
+    }
+
+    const updateUser = await User.findByIdAndUpdate(
+      req.params.id,
+      updateFields,
+      {
+        new: true,
+      }
+    );
+
+    if (updateUser) {
+      res.send({ updateUser });
+    } else {
+      res.send({ message: "Error updating user" });
+    }
+  } catch (error) {
+    console.error("Something went wrong: " + error);
+    res.send({ message: "Error " + error });
+  }
+};
+
 module.exports.updateUser = async (req, res) => {
   try {
     const {
@@ -116,26 +173,38 @@ module.exports.updateUser = async (req, res) => {
       contactPhone,
       password,
       birthDate,
+      contactAddress,
       isAdmin,
     } = req.body;
 
-    const updateUser = await User.findByIdAndUpdate(
-      { _id: req.params.id },
-      {
-        firstName,
-        lastName,
-        contactEmail,
-        contactPhone,
-        password,
-        birthDate,
-        isAdmin,
-      },
-      { new: true }
-    );
+    // Create an object to hold the updated fields
+    const updateFields = {
+      firstName,
+      lastName,
+      contactEmail,
+      contactPhone,
+      contactAddress,
+      birthDate,
+      isAdmin,
+    };
 
-    res.send({ updateUser });
+    // Only hash and update the password if it is provided
+    if (password) {
+      updateFields.password = bcrypt.hashSync(password, 10);
+    }
+
+    const updateUser = await User.findByIdAndUpdate(req.user.id, updateFields, {
+      new: true,
+    });
+
+    if (updateUser) {
+      res.send({ updateUser });
+    } else {
+      res.send({ message: "Error updating user" });
+    }
   } catch (error) {
     console.error("Something went wrong: " + error);
+    res.send({ message: "Error " + error });
   }
 };
 
@@ -159,33 +228,5 @@ module.exports.loginUser = async (req, res) => {
     }
   } catch (error) {
     res.send({ message: "Error " + error });
-  }
-};
-
-module.exports.updateAdmin = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    console.log(user.isAdmin);
-
-    if (user.isAdmin) {
-      const adminStatus = await User.findByIdAndUpdate(
-        req.params.id,
-        {
-          isAdmin: true,
-        },
-        {
-          new: true,
-        }
-      );
-      if (adminStatus.isAdmin == true) {
-        res.send("User has been successfully updated to admin");
-      } else if (adminStatus.isAdmin == false) {
-        res.send("Error updating to admin");
-      }
-    } else {
-      res.send("Error forbidden action");
-    }
-  } catch (error) {
-    res.send({ message: error });
   }
 };
