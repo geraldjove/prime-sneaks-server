@@ -35,6 +35,7 @@ router.put(
   "/update/:id",
   verifyToken,
   verifyAdmin,
+  upload.single("image"),
   productController.updateProduct
 );
 router.delete(

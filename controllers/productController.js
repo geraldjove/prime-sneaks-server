@@ -1,4 +1,4 @@
-const Product = require("../models/Products.js");
+const Product = require("../models/Product.js");
 const multer = require("multer");
 const path = require("path");
 // Set up multer storage
@@ -93,10 +93,13 @@ module.exports.getAllActive = async (req, res) => {
 };
 
 module.exports.getProduct = async (req, res) => {
+  const user = req.user;
+  const isAdmin = user && user.isAdmin;
+
   try {
     const response = await Product.findById(req.params.id);
     if (response) {
-      if (response.isActive) {
+      if (response.isActive || isAdmin) {
         res.send({ ok: response });
       } else {
         res.send({ message: "Product unavailable" });
@@ -105,14 +108,13 @@ module.exports.getProduct = async (req, res) => {
       res.send({ message: "No product found" });
     }
   } catch (error) {
-    res.send({ message: "Error fetching data ", error });
+    res.send({ message: "Error fetching data " + error });
   }
 };
 
 module.exports.updateProduct = async (req, res) => {
   try {
     const {
-      image,
       name,
       description,
       rating,
@@ -123,17 +125,24 @@ module.exports.updateProduct = async (req, res) => {
       isActive,
       isSale,
     } = req.body;
+
+    const parseRating = rating.split(",").map(Number);
+    const parseSize = size.split(",").map(Number);
+    const parseColor = color.split(",").map(String);
+
+    const image = req.file ? req.file.path : req.body.image; // Use the uploaded file path or keep the existing image
+
     const response = await Product.findByIdAndUpdate(
       req.params.id,
       {
         image,
         name,
         description,
-        rating,
+        rating: Number(parseRating),
         price,
         discountedPrice,
-        size,
-        color,
+        size: parseSize,
+        color: parseColor,
         isActive,
         isSale,
       },
@@ -145,10 +154,10 @@ module.exports.updateProduct = async (req, res) => {
     if (response) {
       res.send({ ok: response });
     } else {
-      res.send({ message: "Error udpating product" });
+      res.status(400).send({ message: "Error updating product" });
     }
   } catch (error) {
-    res.send({ message: "Error fetching data ", error });
+    res.status(500).send({ message: "Error fetching data" + error });
   }
 };
 

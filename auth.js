@@ -13,7 +13,7 @@ module.exports.createAccessToken = (user) => {
       };
 
       console.log(data);
-      return jwt.sign(data, secret, {}); // Optionally, you can set an expiration time
+      return jwt.sign(data, secret, { expiresIn: "1h" }); // Optionally, you can set an expiration time
     } else {
       console.log("Error creating access token");
     }
