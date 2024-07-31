@@ -28,7 +28,7 @@ router.post(
   productController.registerProduct // Controller for handling product creation
 );
 
-router.get("/", verifyToken, productController.getAllActive);
+router.get("/", productController.getAllActive);
 router.get("/all", verifyToken, verifyAdmin, productController.getAllProducts);
 router.get("/:id", verifyToken, productController.getProduct);
 router.put(
