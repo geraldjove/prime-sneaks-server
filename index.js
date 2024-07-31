@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -51,5 +52,6 @@ app.use("/public", express.static("public"));
 // Routes
 app.use("/users", userRoutes);
 app.use("/products", productRoutes);
+app.use("/cart", cartRoutes);
 
 module.exports = app;
