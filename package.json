@@ -1,8 +1,9 @@
 {
-  "name": "your-project-name",
+  "name": "prime-sneaks",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"nodemon start\" \"npx json-server --watch api.json --port 8000\""
+    "start": "node index",
+    "dev": "nodemon index"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

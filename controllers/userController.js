@@ -87,7 +87,6 @@ module.exports.getProfile = async (req, res) => {
     } else {
       res.send({ message: "Error fetching user" });
     }
-    console.log(user.id);
   } catch (error) {
     res.send("Error " + error);
   }
