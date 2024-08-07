@@ -53,6 +53,7 @@ module.exports.addToCart = async (req, res) => {
         fetchUserCart.cartItems.push({
           productId: req.body.productId,
           productImage: fetchProduct.image,
+          productImageUrl: fetchProduct.imageUrl,
           name: fetchProduct.name,
           quantity: Number(quantity),
           subTotal: quantity * fetchProduct.price, // subTotal for each individual product item
@@ -70,6 +71,7 @@ module.exports.addToCart = async (req, res) => {
           {
             productId: req.body.productId,
             productImage: fetchProduct.image,
+            productImageUrl: fetchProduct.imageUrl,
             name: fetchProduct.name,
             quantity: Number(quantity),
             subTotal: quantity * fetchProduct.price, // subTotal for each individual product item
