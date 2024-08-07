@@ -15,6 +15,7 @@ const upload = multer({ storage });
 module.exports.registerProduct = async (req, res) => {
   try {
     const {
+      imageUrl,
       name,
       description,
       rating,
@@ -40,6 +41,7 @@ module.exports.registerProduct = async (req, res) => {
 
     const newProduct = new Product({
       image: imagePath,
+      imageUrl,
       name,
       description,
       rating: Number(parseRating),
@@ -55,7 +57,7 @@ module.exports.registerProduct = async (req, res) => {
 
     if (savedProduct) {
       res.status(201).send({
-        message: "Successfully registered product",
+        ok: "Successfully registered product",
         product: savedProduct,
       });
     } else {
@@ -115,6 +117,7 @@ module.exports.getProduct = async (req, res) => {
 module.exports.updateProduct = async (req, res) => {
   try {
     const {
+      imageUrl,
       name,
       description,
       rating,
@@ -130,12 +133,13 @@ module.exports.updateProduct = async (req, res) => {
     const parseSize = size.split(",").map(Number);
     const parseColor = color.split(",").map(String);
 
-    const image = req.file ? req.file.path : req.body.image; // Use the uploaded file path or keep the existing image
+    const image = req.file ? req.file.path : req.body.image;
 
     const response = await Product.findByIdAndUpdate(
       req.params.id,
       {
         image,
+        imageUrl,
         name,
         description,
         rating: Number(parseRating),
